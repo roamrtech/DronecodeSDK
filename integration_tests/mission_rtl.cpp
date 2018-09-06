@@ -80,28 +80,26 @@ void do_mission_with_rtl(float mission_altitude_m, float return_altitude_m)
     LogInfo() << "System ready";
     LogInfo() << "Creating and uploading mission";
 
-    auto new_item = std::make_shared<MissionItem>();
-
-    new_item->set_position(47.398170327054473, 8.5456490218639658);
-    new_item->set_relative_altitude(mission_altitude_m);
-
     std::vector<std::shared_ptr<MissionItem>> mission_items;
-    mission_items.push_back(new_item);
 
-    {
-        LogInfo() << "Uploading mission...";
-        auto prom = std::make_shared<std::promise<void>>();
-        auto future_result = prom->get_future();
-        mission->upload_mission_async(mission_items, [prom](Mission::Result result) {
-            ASSERT_EQ(result, Mission::Result::SUCCESS);
-            prom->set_value();
-            LogInfo() << "Mission uploaded.";
-        });
+    auto first_item = std::make_shared<MissionItem>();
+    first_item->set_position(47.39821545, 8.54562609);
+    first_item->set_relative_altitude(5.0f);
+    mission_items.push_back(first_item);
 
-        auto status = future_result.wait_for(std::chrono::seconds(2));
-        ASSERT_EQ(status, std::future_status::ready);
-        future_result.get();
+    auto first_item = std::make_shared<MissionItem>();
+    second_item->set_position(47.39829534, 8.54488580);
+    second_item->set_gimbal_pitch_and_yaw(-90.0, 0.0);
+    mission_items.push_back(second_item);
+
+    Mission::Result result = mission->upload_mission(mission_items);
+
+    if (result != Mission::Result::SUCCESS) {
+        std::cout << "Failed to upload mission: "
+                  << Mission::result_str(result) << std::endl;
+        return;
     }
+
 
     pc.set_min_altitude(0.0f);
     pc.set_next_reach_altitude(mission_altitude_m);
