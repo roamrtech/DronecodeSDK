@@ -87,7 +87,7 @@ void do_mission_with_rtl(float mission_altitude_m, float return_altitude_m)
     first_item->set_relative_altitude(5.0f);
     mission_items.push_back(first_item);
 
-    auto first_item = std::make_shared<MissionItem>();
+    auto second_item = std::make_shared<MissionItem>();
     second_item->set_position(47.39829534, 8.54488580);
     second_item->set_gimbal_pitch_and_yaw(-90.0, 0.0);
     mission_items.push_back(second_item);
